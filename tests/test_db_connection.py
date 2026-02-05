@@ -1,12 +1,13 @@
 import mysql.connector
 from mysql.connector import Error
+connection = None
 
 try:
     connection = mysql.connector.connect(
         host='localhost',
         database='epic_events',
         user='epic_user',
-        password='mdp@123'
+        password='epic@123'
     )
 
     if connection.is_connected():
