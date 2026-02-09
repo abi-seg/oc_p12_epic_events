@@ -18,3 +18,4 @@ class Contrat(Base):
 
     client = relationship("Client", back_populates="contrats")
     commercial = relationship("Utilisateur", back_populates="contrats")
+    evenements = relationship("Evenement", back_populates="contrat")

@@ -1,6 +1,9 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from .base import Base
+from models.client import Client
+from models.contrat import Contrat
+from models.evenement import Evenement
 
 
 class Utilisateur(Base):
@@ -15,6 +18,8 @@ class Utilisateur(Base):
     # Un commercial peut avoir plusieurs clients
     clients = relationship("Client", back_populates="commercial")
     contrats = relationship("Contrat", back_populates="commercial")
+
+    # Un utilisateur support peut avoir plusieurs evenements
     evenements = relationship("Evenement", back_populates="support")
 
     def __repr__(self):
