@@ -1,5 +1,6 @@
 from services.utilisateur_service import UtilisateurService
 from models.base import Session
+from utils.jwt_manager import load_token
 
 
 def run_create_user():
@@ -21,7 +22,11 @@ def run_create_user():
 
 
 def list_all_users():
-    print("DEBUG: In list_all_users()")
+    payload = load_token()
+    if not payload or payload['role'] != 'gestion':
+        print("Accès refusé. GESTION Uniquement.")
+        return
+
     session = Session()
     service = UtilisateurService(session)
 
