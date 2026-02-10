@@ -17,25 +17,38 @@ with engine.connect() as connection:
 
 
 def main_menu():
+    logged_user = None
+
     while True:
         print("\n ***** MENU PRINCIPAL *****")
-        print("1 - Créer un nouvel utilisateur")
-        print("2 - Se connecter")
-        print("3 - Voir tous les utilisateurs")
-        print("4 - Quitter")
+        print("1 - Se connecter")
+        if logged_user:
+            print("2 - Créer un utilisateur")  # Gestion only
+            print("3 - Voir tous les utilisateurs")  # Gestion only
+            print("4 - Déconnexion")
+        print("0 - Quitter")
 
-        choice = input("choissiez une option (1/2/3/4): ")
+        choice = input("choissiez une option : ")
         if choice == "1":
-            run_create_user()
+            logged_user = run_login()  # store logged-in user
         elif choice == "2":
-            run_login()
+            if logged_user and logged_user.role == "gestion":
+                run_create_user()
+            else:
+                print("Access interdit. GESTION Uniquement.")
         elif choice == "3":
-            list_all_users()
+            if logged_user and logged_user.role == "gestion":
+                list_all_users()
+            else:
+                print("Access interdit. GESTION Uniquement.")
         elif choice == "4":
-            print("Au revoir !")
+            logged_user == None
+            print("Déconnecté avec succès.")
+        elif choice == "0":
+            print("Au revoir!")
             break
         else:
-            print("Option invalide. Veuillez réessayer.")
+            print("Option invalide.")
 
 
 if __name__ == "__main__":

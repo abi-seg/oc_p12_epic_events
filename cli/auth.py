@@ -21,7 +21,9 @@ def run_login():
 
     if user:
         print(f"Connexion réussie! Bienvenue {user.nom} ({user.role})")
+        session.close()
+        return user  # return logged-in user
     else:
         print("échec de l'authentification")
-
-    session.close()
+        session.close()
+        return None
