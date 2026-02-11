@@ -1,3 +1,4 @@
+import getpass
 from cli.auth import run_login, run_logout
 from models.base import Base, engine
 from sqlalchemy import text
@@ -20,7 +21,7 @@ with engine.connect() as connection:
 def main_menu():
 
     while True:
-        payload = load_token  # check if user is authenticated
+        payload = load_token()  # check if user is authenticated
         print("\n ***** MENU PRINCIPAL *****")
         print("1 - Se connecter")
         if payload:
@@ -43,7 +44,7 @@ def main_menu():
             else:
                 print("Access interdit. GESTION Uniquement.")
         elif choice == "4":
-            run_logout
+            run_logout()
 
         elif choice == "0":
             print("Au revoir!")
