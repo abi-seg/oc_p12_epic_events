@@ -2,7 +2,8 @@ from services.utilisateur_service import UtilisateurService
 from models.base import Session
 from utils.jwt_manager import generate_token, load_token
 import os
-from getpass import getpass
+import maskpass
+# from getpass import getpass
 
 
 def run_login():
@@ -19,7 +20,8 @@ def run_login():
     session = Session()
     service = UtilisateurService(session)
     email = input("Email: ")
-    password = getpass("Mot de passe: ")  # secured password entry
+    password = maskpass.askpass(
+        prompt="Mot de passe: ", mask="*")  # secured password entry
     user = service.login(email, password)
 
     if user:
