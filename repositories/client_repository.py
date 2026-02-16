@@ -56,3 +56,29 @@ class ClientRepository:
 
         """
         return self.session.query(Client).filter_by(commercial_id=commercial_id).all()
+
+    def get_by_id(self, client_id):
+        """
+        Retrieve a single client by its identifier.
+        Parameters:
+            client_id : int
+            Primary key of the client to load.
+        Returns
+            The matching client instance if found,otherwise none.
+        """
+        return self.session.query(Client).filter_by(id=client_id).first()
+
+    def update(self, client):
+        """
+        Saves the pending changes for the given client to the database.
+
+        Parameters
+           client : Client
+           The client instance whose modifications have already been applied to the 
+           SQLALchemy session.
+       """
+        self.session.commit()
+
+    def delete(self, client):
+        self.session.delete(client)
+        self.session.commit()

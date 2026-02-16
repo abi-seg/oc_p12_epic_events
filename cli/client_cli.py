@@ -78,23 +78,138 @@ def list_clients():
         print("Aucun client trouvé.")
     else:
         print(" **** LISTE DES CLIENTS ****")
-        for client in clients:
-            commercial = client.commercial.nom if client.commercial else "Inconnu"
-            print(
-                f"- {client.nom_complet} | {client.email} | {client.entreprise} | Commercial : {commercial}")
+        print(
+            f"{'ID':<4} | {'Nom complet':<20} | {'Email':<30} | {'Entreprise':<25} | Commercial")
+        print("-" * 110)
+
+    for client in clients:
+        commercial_name = client.commercial.nom if client.commercial else "Non assigné"
+        print(f"{client.id:<4} | {client.nom_complet:<20} | {client.email:<30} | {client.entreprise:<25} | {commercial_name}")
+    session.close()
+
+
+def update_client():
+    """
+    Run the interactive client update flow in the CLI for commercial users.
+
+    This function:
+      - Verifies that the current user is authenticated and has the
+        'commercial' role via the JWT payload.
+      - Loads the logged-in commercial from the database and retrieves
+        only the clients assigned to that user.
+      - Displays the list of these clients and prompts for the ID of
+        the client to update.
+      - Ensures the selected client exists and belongs to the current
+        commercial before allowing any modification.
+      - Prompts for new values for each field (name, email, phone,
+        company), allowing the user to leave fields empty to keep the
+        existing values.
+      - Applies the requested changes through the ClientService and
+        confirms the update in the CLI.
+
+    Access
+    ------
+    Restricted to users with the 'commercial' role.
+    """
+    payload = load_token()
+    if not payload:
+        print("Veuillez vous connecter.")
+        return
+
+    session = Session()
+    user_service = UtilisateurService(session)
+    user = user_service.repo.find_by_email(payload["email"])
+    client_service = ClientService(session)
+
+    #  Gestion sees all the clients, commercial sees only theirs
+    if payload['role'] == 'gestion':
+        clients = client_service.get_all_clients()
+    elif payload['role'] == 'commercial':
+        clients = client_service.get_clients_by_commercial_id(user.id)
+    else:
+        print("Accès non autorisé à la modification de client.")
+    # show clients to select from
+    if not clients:
+        print(" Vous n’avez aucun client.")
+        session.close()
+        return
+
+    print("\n Vos clients :")
+    for client in clients:
+        print(
+            f"ID: {client.id} | Nom: {client.nom_complet} | Entreprise: {client.entreprise}")
+
+    client_id = input("Entrez l’ID du client à modifier : ")
+    client = client_service.get_client_by_id(client_id)
+
+    if not client:
+        print(" Client introuvable.")
+        session.close()
+        return
+   # check if commercial owns this client
+
+    if payload["role"] == "commercial" and client.commercial_id != user.id:
+        print(" Vous ne pouvez modifier que vos propres clients.")
+        session.close()
+        return
+
+    # Input modifications
+    print("Laissez vide pour ne pas modifier un champ.")
+    new_nom = input(f"Nouveau nom ({client.nom_complet}): ")
+    new_email = input(f"Nouveau email ({client.email}): ")
+    new_phone = input(f"Nouveau téléphone ({client.telephone}): ")
+    new_entreprise = input(f"Nouveau entreprise ({client.entreprise}): ")
+
+    updates = {}
+    if new_nom:
+        updates["nom_complet"] = new_nom
+    if new_email:
+        updates["email"] = new_email
+    if new_phone:
+        updates["telephone"] = new_phone
+    if new_entreprise:
+        updates["entreprise"] = new_entreprise
+
+    client_service.update_client(client, **updates)
+    print("Client mis à jour avec succès.")
 
     session.close()
 
 
-def whoami():
+def delete_client():
     """
-    Displays the information of the user who is actually connected.
+    Run the interactive client deletion flow in the CLI for admin users.
 
+    This function:
+      - Verifies that the current user is authenticated and has the
+        'gestion' role using the JWT payload.
+      - Opens a database session and resolves the ClientService.
+      - Prompts for the ID of the client to delete and attempts to load
+        the corresponding Client entity.
+      - If the client exists, asks for a confirmation before deletion.
+      - Delegates the actual removal to the ClientService and reports
+        the result in the CLI.
+
+    Access
+    ------
+    Restricted to users with the 'gestion' role.
     """
     payload = load_token()
-    if not payload:
-        print("Aucun utilisateur connecté.")
+    if not payload or payload["role"] != "gestion":
+        print("Seul le gestion peut supprimer un client.")
         return
-    print(" **** UTILISATEUR CONNECTER ****")
-    print(f" - Email : {payload['email']}")
-    print(f" - Role : {payload['role']}")
+
+    session = Session()
+    service = ClientService(session)
+
+    client_id = input("ID du client à supprimer : ")
+    client = service.get_client_by_id(client_id)
+
+    if not client:
+        print(" Client non trouvé.")
+    else:
+        confirm = input(f"Supprimer {client.nom_complet} ? (o/n): ")
+        if confirm.lower() == 'o':
+            service.delete_client(client)
+            print(" Client supprimé.")
+    session.close()

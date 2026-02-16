@@ -4,7 +4,7 @@ from models.base import Base, engine
 from sqlalchemy import text
 from cli.user_cli import run_create_user, list_all_users
 from utils.jwt_manager import load_token
-from cli.client_cli import run_create_client, list_clients
+from cli.client_cli import run_create_client, list_clients, update_client, delete_client
 
 
 # Placeholder - no models yet, we just test the connection
@@ -32,6 +32,8 @@ def main_menu():
             print("5 - Créer un client")
             print("6 - Voir les clients")
             print("7 - Info utilisateur connecté (whoami)")
+            print("8 - Modifier un client")
+            print("9 - Supprimer un client")
         print("0 - Quitter")
 
         choice = input("choissiez une option : ")
@@ -58,6 +60,10 @@ def main_menu():
 
         elif choice == "7":
             whoami()
+        elif choice == "8":
+            update_client()
+        elif choice == "9":
+            delete_client()
 
         elif choice == "0":
             print("Au revoir!")
