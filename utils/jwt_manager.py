@@ -1,7 +1,7 @@
 import jwt
 import datetime
 
-SECRET_KEY = "your-jwt-secret"
+SECRET_KEY = "we8nfw8efnwefwen8fw9efne9fwenv38fwenv38f38"
 
 
 def generate_token(email, role):

@@ -1,10 +1,10 @@
 import getpass
-from cli.auth import run_login, run_logout
+from cli.auth import run_login, run_logout, whoami
 from models.base import Base, engine
 from sqlalchemy import text
 from cli.user_cli import run_create_user, list_all_users
 from utils.jwt_manager import load_token
-from cli.client_cli import run_create_client
+from cli.client_cli import run_create_client, list_clients
 
 
 # Placeholder - no models yet, we just test the connection
@@ -30,6 +30,8 @@ def main_menu():
             print("3 - Voir tous les utilisateurs")  # Gestion only
             print("4 - Déconnexion")
             print("5 - Créer un client")
+            print("6 - Voir les clients")
+            print("7 - Info utilisateur connecté (whoami)")
         print("0 - Quitter")
 
         choice = input("choissiez une option : ")
@@ -50,6 +52,12 @@ def main_menu():
 
         elif choice == "5":
             run_create_client()
+
+        elif choice == "6":
+            list_clients()
+
+        elif choice == "7":
+            whoami()
 
         elif choice == "0":
             print("Au revoir!")

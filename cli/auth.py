@@ -1,6 +1,6 @@
 from services.utilisateur_service import UtilisateurService
 from models.base import Session
-from utils.jwt_manager import generate_token
+from utils.jwt_manager import generate_token, load_token
 import os
 from getpass import getpass
 
@@ -50,3 +50,17 @@ def run_logout():
         print("Déconnexion réussie.")
     else:
         print("Aucun token trouvé.")
+
+
+def whoami():
+    """
+    Displays the information of the user who is actually connected.
+
+    """
+    payload = load_token()
+    if not payload:
+        print("Aucun utilisateur connecté.")
+        return
+    print(" **** UTILISATEUR CONNECTER ****")
+    print(f" - Email : {payload['email']}")
+    print(f" - Role : {payload['role']}")

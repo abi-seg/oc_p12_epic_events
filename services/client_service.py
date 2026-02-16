@@ -54,3 +54,22 @@ class ClientService:
         )
         self.repo.save(client)
         return client
+
+    def get_all_clients(self):
+        """
+        Retrieve all clients from the database.
+
+        Returns: A list containing all the saved Client entities.
+
+        """
+        return self.repo.get_all()
+
+    def get_clients_by_commercial_id(self, commercial_id):
+        """
+        Retrieve all clients assigned to a specific commercial user.
+
+        Returns:
+            A list of Client entities linked to the given commercial_id.
+
+        """
+        return self.repo.get_by_commercial_id(commercial_id)
