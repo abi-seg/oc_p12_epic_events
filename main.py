@@ -4,6 +4,7 @@ from models.base import Base, engine
 from sqlalchemy import text
 from cli.user_cli import run_create_user, list_all_users
 from utils.jwt_manager import load_token
+from cli.client_cli import run_create_client
 
 
 # Placeholder - no models yet, we just test the connection
@@ -28,6 +29,7 @@ def main_menu():
             print("2 - Créer un utilisateur")  # Gestion only
             print("3 - Voir tous les utilisateurs")  # Gestion only
             print("4 - Déconnexion")
+            print("5 - Créer un client")
         print("0 - Quitter")
 
         choice = input("choissiez une option : ")
@@ -45,6 +47,9 @@ def main_menu():
                 print("Access interdit. GESTION Uniquement.")
         elif choice == "4":
             run_logout()
+
+        elif choice == "5":
+            run_create_client()
 
         elif choice == "0":
             print("Au revoir!")
