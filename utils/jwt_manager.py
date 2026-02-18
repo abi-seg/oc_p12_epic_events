@@ -4,12 +4,13 @@ import datetime
 SECRET_KEY = "we8nfw8efnwefwen8fw9efne9fwenv38fwenv38f38"
 
 
-def generate_token(email, role):
+def generate_token(user_id, email, role):
     """
     Generate a JWT token for the logged-in user
 
     """
     payload = {
+        "id": user_id,
         "email": email,
         "role": role,
         "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)

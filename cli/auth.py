@@ -26,7 +26,7 @@ def run_login():
 
     if user:
         print(f"Connexion réussie! Bienvenue {user.nom} ({user.role})")
-        token = generate_token(user.email, user.role)
+        token = generate_token(user.id, user.email, user.role)
         # save token locally in .token file
         with open(".token", "w")as f:
             f.write(token)

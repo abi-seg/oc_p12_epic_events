@@ -17,6 +17,7 @@ engine = create_engine(DATABASE_URL, echo=False)
 
 # session locale
 Session = sessionmaker(bind=engine)
+# removes the sql log in console.
 logging.getLogger("sqlalchemy.engine").setLevel(logging.ERROR)
 
 # Base commune pour les modèles
