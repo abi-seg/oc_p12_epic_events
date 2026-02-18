@@ -23,51 +23,75 @@ with engine.connect() as connection:
 
 
 def main_menu():
-
     while True:
-        payload = load_token()  # check if user is authenticated
+        payload = load_token()
+        role = payload["role"] if payload else None
+
         print("\n ***** MENU PRINCIPAL *****")
-        print("1 - Se connecter")
-        if payload:
-            print("2 - Créer un utilisateur")  # Gestion only
-            print("3 - Voir tous les utilisateurs")  # Gestion only
-            print("4 - Déconnexion")
+
+        # --- Not logged in ---
+        if not payload:
+            print("1 - Se connecter")
+            print("0 - Quitter")
+            choice = input("Choisissez une option : ")
+
+            if choice == "1":
+                run_login()
+            elif choice == "0":
+                print("Au revoir!")
+                break
+            else:
+                print("Option invalide.")
+            continue  # restart loop
+
+        # --- Logged in ---
+        print(f"Connecté en tant que {payload['email']} (rôle : {role})")
+        print("4 - Déconnexion")
+        print("7 - Info utilisateur connecté (whoami)")
+
+        # Lecture seule – tous les rôles
+        print("6 - Voir les clients")
+        print("11 - Voir les contrats")
+
+        if role == "gestion":
+            print("2 - Créer un utilisateur")
+            print("3 - Voir tous les utilisateurs")
             print("5 - Créer un client")
-            print("6 - Voir les clients")
-            print("7 - Info utilisateur connecté (whoami)")
             print("8 - Modifier un client")
             print("9 - Supprimer un client")
+
             print("10 - Créer un contrat")
-            print("11 - Voir les contrats")
             print("12 - Voir les contrats non signés")
-            print("13 - Voir les contrats non payés")
-            print("14 - Modifier un contrat")
-            print("15 - Supprimer un contrat")
+            print("13 - Voir les contrats non entièrement payés")
+            # plus tard : options événements (création, assignation support, etc.)
 
-        print("0 - Quitter")
+        elif role == "commercial":
+            print("5 - Créer un client")
+            print("8 - Modifier un client")
 
-        choice = input("choissiez une option : ")
-        if choice == "1":
-            logged_user = run_login()  # store logged-in user
-        elif choice == "2":
-            if payload and payload['role'] == "gestion":
-                run_create_user()
-            else:
-                print("Access interdit. GESTION Uniquement.")
+            print("10 - Créer un contrat")
+            print("12 - Voir les contrats non signés")
+            print("13 - Voir les contrats non entièrement payés")
+            # plus tard : créer un événement pour un contrat signé
+
+        elif role == "support":
+            # pour l’instant: lecture seule, plus tard événements
+            # (respecter le cahier des charges : lecture seule clients/contrats/événements)
+            pass
+
+        choice = input("Choisissez une option : ")
+
+        # --- Actions communes / existantes ---
+        if choice == "2":
+            run_create_user()           # déjà protégé par rôle à l’intérieur si tu veux
         elif choice == "3":
-            if payload and payload['role'] == "gestion":
-                list_all_users()
-            else:
-                print("Access interdit. GESTION Uniquement.")
+            list_all_users()
         elif choice == "4":
             run_logout()
-
         elif choice == "5":
             run_create_client()
-
         elif choice == "6":
             list_clients()
-
         elif choice == "7":
             whoami()
         elif choice == "8":
@@ -82,10 +106,6 @@ def main_menu():
             run_list_contrats_non_signes()
         elif choice == "13":
             run_list_contrats_non_payes()
-        elif choice == "14":
-            run_update_contrat()
-        elif choice == "15":
-            run_delete_contrat()
         elif choice == "0":
             print("Au revoir!")
             break
