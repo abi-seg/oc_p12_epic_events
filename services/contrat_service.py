@@ -92,3 +92,15 @@ class ContratService:
         Delete a contract from the database.
         """
         self.repo.delete(contrat)
+
+    def get_unsigned_contrats(self):
+        """
+        Get all contrats that are not signed.
+        """
+        return self.repo.get_by_staut(False)
+
+    def get_unpaid_contrats(self):
+        """
+        Get all contrats where montant_restant > 0.
+        """
+        return self.repo.get_unpaid()

@@ -5,7 +5,10 @@ from sqlalchemy import text
 from cli.user_cli import run_create_user, list_all_users
 from utils.jwt_manager import load_token
 from cli.client_cli import run_create_client, list_clients, update_client, delete_client
-from cli.contrat_cli import run_create_contrat, run_list_contrats, run_update_contrat, run_delete_contrat
+from cli.contrat_cli import (
+    run_create_contrat, run_list_contrats, run_update_contrat, run_delete_contrat,
+    run_list_contrats_non_payes, run_list_contrats_non_signes)
+
 
 # Placeholder - no models yet, we just test the connection
 Base.metadata.create_all(engine)
@@ -36,8 +39,11 @@ def main_menu():
             print("9 - Supprimer un client")
             print("10 - Créer un contrat")
             print("11 - Voir les contrats")
-            print("12 - Modifier un contrat")
-            print("13 - Supprimer un contrat")
+            print("12 - Voir les contrats non signés")
+            print("13 - Voir les contrats non payés")
+            print("14 - Modifier un contrat")
+            print("15 - Supprimer un contrat")
+
         print("0 - Quitter")
 
         choice = input("choissiez une option : ")
@@ -73,8 +79,12 @@ def main_menu():
         elif choice == "11":
             run_list_contrats()
         elif choice == "12":
-            run_update_contrat()
+            run_list_contrats_non_signes()
         elif choice == "13":
+            run_list_contrats_non_payes()
+        elif choice == "14":
+            run_update_contrat()
+        elif choice == "15":
             run_delete_contrat()
         elif choice == "0":
             print("Au revoir!")

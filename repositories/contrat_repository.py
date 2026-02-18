@@ -66,3 +66,25 @@ class ContratRepository:
         """
         self.session.delete(contrat)
         self.session.commit()
+
+    def get_by_staut(self, statut: bool):
+        """
+        Retrieve contrats filtered by signature status.
+        """
+        return (
+            self.session
+            .query(Contrat)
+            .filter(Contrat.statut == statut)
+            .all()
+        )
+
+    def get_unpaid(self):
+        """
+        Retrieve contracts where the remainig amount is greater than zero.
+        """
+        return (
+            self.session
+            .query(Contrat)
+            .filter(Contrat.montant_restant > 0)
+            .all()
+        )

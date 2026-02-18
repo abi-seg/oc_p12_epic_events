@@ -356,3 +356,126 @@ def run_delete_contrat():
         print("Suppression annulée.")
 
     session.close()
+
+
+def run_list_contrats_non_signes():
+    """
+    Display contracts that are not yet signed.
+
+    - 'gestion' : sees all unsigned contracts.
+    - 'commercial' : sees only their own unsigned contracts.
+    - others : access denied (for now).
+    """
+    payload = load_token()
+    if not payload:
+        print("Veuillez vous connecter.")
+        return
+
+    session = Session()
+    contrat_service = ContratService(session)
+    user_service = UtilisateurService(session)
+
+    user = user_service.repo.find_by_email(payload["email"])
+    if not user:
+        print("Utilisateur introuvable.")
+        session.close()
+        return
+
+    role = payload["role"]
+
+    if role == "gestion":
+        contrats = contrat_service.get_unsigned_contrats()
+    elif role == "commercial":
+        tous = contrat_service.get_contrats_by_commercial_id(user.id)
+        contrats = [c for c in tous if not c.statut]
+    else:
+        print("Accès non autorisé pour votre rôle.")
+        session.close()
+        return
+
+    if not contrats:
+        print("Aucun contrat non signé trouvé.")
+        session.close()
+        return
+
+    print(" **** CONTRATS NON SIGNÉS ****")
+    print(
+        f"{'ID':<4} | {'Client':<25} | {'Commercial':<15} | "
+        f"{'Total (€)':<10} | {'Restant (€)':<12} | {'Date':<12}"
+    )
+    print("-" * 100)
+
+    for c in contrats:
+        client_name = c.client.nom_complet if c.client else "Inconnu"
+        commercial_name = c.commercial.nom if c.commercial else "Inconnu"
+        date_str = c.date_creation.strftime(
+            "%Y-%m-%d") if c.date_creation else "N/A"
+        print(
+            f"{c.id:<4} | {client_name:<25} | {commercial_name:<15} | "
+            f"{float(c.montant_total):<10.2f} | {float(c.montant_restant):<12.2f} | "
+            f"{date_str:<12}"
+        )
+
+    session.close()
+
+
+def run_list_contrats_non_payes():
+    """
+        Display contracts that are not fully paid (montant_restant > 0).
+
+            - 'gestion' : sees all unpaid contracts.
+            - 'commercial' : sees only their own unpaid contracts.
+            - others : access denied (for now).
+    """
+    payload = load_token()
+    if not payload:
+        print("Veuillez vous connecter.")
+        return
+
+    session = Session()
+    contrat_service = ContratService(session)
+    user_service = UtilisateurService(session)
+
+    user = user_service.repo.find_by_email(payload["email"])
+    if not user:
+        print("Utilisateur introuvable.")
+        session.close()
+        return
+
+    role = payload["role"]
+
+    if role == "gestion":
+        contrats = contrat_service.get_unpaid_contrats()
+    elif role == "commercial":
+        tous = contrat_service.get_contrats_by_commercial_id(user.id)
+        contrats = [c for c in tous if c.montant_restant > 0]
+    else:
+        print("Accès non autorisé pour votre rôle.")
+        session.close()
+        return
+
+    if not contrats:
+        print("Aucun contrat non payé trouvé.")
+        session.close()
+        return
+
+    print(" **** CONTRATS NON ENTIÈREMENT PAYÉS ****")
+    print(
+        f"{'ID':<4} | {'Client':<25} | {'Commercial':<15} | "
+        f"{'Total (€)':<10} | {'Restant (€)':<12} | {'Date':<12} | {'Statut':<8}"
+    )
+    print("-" * 110)
+
+    for c in contrats:
+        client_name = c.client.nom_complet if c.client else "Inconnu"
+        commercial_name = c.commercial.nom if c.commercial else "Inconnu"
+        date_str = c.date_creation.strftime(
+            "%Y-%m-%d") if c.date_creation else "N/A"
+        statut_label = "Signé" if c.statut else "Non signé"
+        print(
+            f"{c.id:<4} | {client_name:<25} | {commercial_name:<15} | "
+            f"{float(c.montant_total):<10.2f} | {float(c.montant_restant):<12.2f} | "
+            f"{date_str:<12} | {statut_label:<8}"
+        )
+
+    session.close()
