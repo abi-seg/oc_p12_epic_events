@@ -79,12 +79,14 @@ def list_clients():
     else:
         print(" **** LISTE DES CLIENTS ****")
         print(
-            f"{'ID':<4} | {'Nom complet':<20} | {'Email':<30} | {'Entreprise':<25} | Commercial")
-        print("-" * 110)
+            f"{'ID':<4} | {'Nom complet':<20} | {'Email':<30} | "
+            f" {'Téléphone':<15} | {'Entreprise':<25} | Commercial")
+        print("-" * 120)
 
     for client in clients:
         commercial_name = client.commercial.nom if client.commercial else "Non assigné"
-        print(f"{client.id:<4} | {client.nom_complet:<20} | {client.email:<30} | {client.entreprise:<25} | {commercial_name}")
+        print(f"{client.id:<4} | {client.nom_complet:<20} | {client.email:<30} |"
+              f"{client.telephone:<15} | {client.entreprise:<25} | {commercial_name}")
     session.close()
 
 
