@@ -8,7 +8,7 @@ from cli.client_cli import run_create_client, list_clients, update_client, delet
 from cli.contrat_cli import (
     run_create_contrat, run_list_contrats, run_update_contrat, run_delete_contrat,
     run_list_contrats_non_payes, run_list_contrats_non_signes)
-
+from cli.evenement_cli import run_create_evenement
 
 # Placeholder - no models yet, we just test the connection
 Base.metadata.create_all(engine)
@@ -72,6 +72,7 @@ def main_menu():
             print("10 - Créer un contrat")
             print("12 - Voir les contrats non signés")
             print("13 - Voir les contrats non entièrement payés")
+            print("14 - Créer un événement")
             # plus tard : créer un événement pour un contrat signé
 
         elif role == "support":
@@ -106,6 +107,9 @@ def main_menu():
             run_list_contrats_non_signes()
         elif choice == "13":
             run_list_contrats_non_payes()
+        elif choice == "14":
+            run_create_evenement()
+
         elif choice == "0":
             print("Au revoir!")
             break
