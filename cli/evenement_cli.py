@@ -130,3 +130,109 @@ def run_create_evenement():
     print(
         f"Événement #{evenement.id} créé avec succès pour le client {nom_client}.")
     session.close()
+
+
+def run_list_evenements():
+    """
+    Display events in the CLI according to the current user's role.
+
+    - 'gestion'   : sees all events.
+    - 'commercial': sees events linked to their own contracts.
+    - 'support'   : sees only events assigned to them.
+    """
+    payload = load_token()
+    if not payload:
+        print("Veuillez vous connecter.")
+        return
+
+    session = Session()
+    evenement_service = EvenementService(session)
+    user_service = UtilisateurService(session)
+
+    user = user_service.repo.find_by_email(payload["email"])
+    if not user:
+        print("Utilisateur introuvable.")
+        session.close()
+        return
+
+    role = payload["role"]
+
+    if role == "gestion":
+        evenements = evenement_service.get_all_evenements()
+    elif role == "commercial":
+        # Load all events and filter by contracts belonging to this commercial
+        tous = evenement_service.get_all_evenements()
+        evenements = [
+            e for e in tous
+            if e.contrat and e.contrat.commercial_id == user.id
+        ]
+    elif role == "support":
+        evenements = evenement_service.get_evenements_by_support_id(user.id)
+    else:
+        print("Rôle non autorisé.")
+        session.close()
+        return
+
+    if not evenements:
+        print("Aucun événement trouvé.")
+        session.close()
+        return
+
+    table = Table(title="Liste des événements")
+
+    table.add_column("Event ID", justify="right", style="cyan", no_wrap=True)
+    table.add_column("Contract ID", justify="right", style="green")
+    table.add_column("Client name", style="magenta")
+    table.add_column("Client contact", style="yellow")
+    table.add_column("Event date start", style="white")
+    table.add_column("Event date end", style="white")
+    table.add_column("Support contact", style="blue")
+    table.add_column("Location", style="white")
+    table.add_column("Attendees", justify="right", style="bright_white")
+    table.add_column("Notes", style="bright_black")
+
+    for e in evenements:
+        # Client name: use nom_client if set, otherwise via relation
+        client_name = (
+            e.nom_client
+            or (e.contrat.client.nom_complet if e.contrat and e.contrat.client else "Inconnu")
+        )
+        # Client contact: use contact_client if set, otherwise try from client entity
+        if e.contact_client:
+            client_contact = e.contact_client
+        elif e.contrat and e.contrat.client:
+            cl = e.contrat.client
+            client_contact = f"{cl.email or ''} / {cl.telephone or ''}"
+        else:
+            client_contact = ""
+
+        support_name = e.support.nom if e.support else "Non assigné"
+        debut_str = e.date_debut.strftime(
+            "%Y-%m-%d %H:%M") if e.date_debut else "N/A"
+        fin_str = e.date_fin.strftime(
+            "%Y-%m-%d %H:%M") if e.date_fin else "N/A"
+        contrat_id_str = str(e.contrat_id) if e.contrat_id else "N/A"
+        participants_str = str(
+            e.participants) if e.participants is not None else ""
+
+        # Notes potentially longues → on tronque pour l'affichage
+        if e.notes and len(e.notes) > 60:
+            notes_short = e.notes[:57] + "..."
+        else:
+            notes_short = e.notes or ""
+
+        table.add_row(
+            str(e.id),           # Event ID
+            contrat_id_str,      # Contract ID
+            client_name,         # Client name
+            client_contact,      # Client contact
+            debut_str,           # Event date start
+            fin_str,             # Event date end
+            support_name,        # Support contact
+            e.lieu or "",        # Location
+            participants_str,    # Attendees
+            notes_short,         # Notes
+        )
+
+    console.print(table)
+    session.close()

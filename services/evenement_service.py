@@ -48,3 +48,9 @@ class EvenementService:
         Retrieve all events from the database.
         """
         return self.repo.get_all()
+
+    def get_evenements_by_support_id(self, support_id: int):
+        """
+        Retrieve all events assigned to a specific support user.
+        """
+        return self.repo.get_by_support_id(support_id)

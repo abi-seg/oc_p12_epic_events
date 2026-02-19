@@ -26,3 +26,14 @@ class EvenementRepository:
         Retrieve all evenements from the database.
         """
         return self.session.query(Evenement).all()
+
+    def get_by_support_id(self, support_id: int):
+        """
+        Retrieve all events assigned to a specific support user.
+        """
+        return (
+            self.session
+            .query(Evenement)
+            .filter(Evenement.support_id == support_id)
+            .all()
+        )
