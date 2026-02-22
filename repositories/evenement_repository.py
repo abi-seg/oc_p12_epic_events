@@ -37,3 +37,17 @@ class EvenementRepository:
             .filter(Evenement.support_id == support_id)
             .all()
         )
+
+    def get_by_id(self, evenement_id: int):
+        """
+        Retrieve an event by its identifier.
+        """
+        return self.session.query(Evenement).get(evenement_id)
+
+    def update(self, evenement: Evenement):
+        """
+        Persist changes made to an existing event.
+        """
+        self.session.commit()
+        self.session.refresh(evenement)
+        return evenement

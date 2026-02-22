@@ -46,3 +46,9 @@ class UtilisateurRepository:
 
         """
         return self.session.query(Utilisateur).all()
+
+    def get_by_id(self, user_id: int):
+        """
+        Retrieve a user by its identifier.
+        """
+        return self.session.query(Utilisateur).get(user_id)

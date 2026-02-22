@@ -236,3 +236,217 @@ def run_list_evenements():
 
     console.print(table)
     session.close()
+
+
+def run_update_evenement():
+    """
+    Run the interactive event update flow in the CLI.
+
+    Rules:
+      - User must be authenticated.
+      - 'gestion' can modify any event.
+      - 'support' can modify only events assigned to them.
+      - 'commercial' cannot modify events.
+    """
+    payload = load_token()
+    if not payload:
+        print("Veuillez vous connecter.")
+        return
+
+    role = payload["role"]
+    if role not in ("gestion", "support"):
+        print("Seuls les rôles GESTION ou SUPPORT peuvent modifier un événement.")
+        return
+
+    session = Session()
+    evenement_service = EvenementService(session)
+    user_service = UtilisateurService(session)
+
+    user = user_service.repo.find_by_email(payload["email"])
+    if not user:
+        print("Utilisateur introuvable.")
+        session.close()
+        return
+
+    # Charger les événements accessibles selon le rôle
+    if role == "gestion":
+        evenements = evenement_service.get_all_evenements()
+    else:  # support
+        evenements = evenement_service.get_evenements_by_support_id(user.id)
+
+    if not evenements:
+        print("Aucun événement disponible pour modification.")
+        session.close()
+        return
+
+    # Afficher les événements avec rich
+    table = Table(title="Événements modifiables")
+    table.add_column("ID", justify="right", style="cyan", no_wrap=True)
+    table.add_column("Client", style="magenta")
+    table.add_column("Support", style="blue")
+    table.add_column("Début", style="white")
+    table.add_column("Fin", style="white")
+    table.add_column("Lieu", style="yellow")
+    table.add_column("Participants", justify="right", style="bright_white")
+
+    for e in evenements:
+        client_name = e.nom_client or (
+            e.contrat.client.nom_complet if e.contrat and e.contrat.client else "Inconnu"
+        )
+        debut_str = e.date_debut.strftime(
+            "%Y-%m-%d %H:%M") if e.date_debut else "N/A"
+        fin_str = e.date_fin.strftime(
+            "%Y-%m-%d %H:%M") if e.date_fin else "N/A"
+        participants_str = str(
+            e.participants) if e.participants is not None else ""
+        if e.support:
+            support_label = f"{e.support.id} - {e.support.nom}"
+        else:
+            support_label = "Non assigné"
+
+        table.add_row(
+            str(e.id),
+            client_name,
+            support_label,
+            debut_str,
+            fin_str,
+            e.lieu or "",
+            participants_str,
+        )
+
+    console.print(table)
+
+    evenement_id_input = input("Entrez l'ID de l'événement à modifier : ")
+    try:
+        evenement_id = int(evenement_id_input)
+    except ValueError:
+        print("ID d'événement invalide.")
+        session.close()
+        return
+
+    evenement = evenement_service.get_evenement_by_id(evenement_id)
+    if not evenement:
+        print("Événement introuvable.")
+        session.close()
+        return
+
+    # Sécurité : le support ne peut modifier que ses propres événements
+    if role == "support" and evenement.support_id != user.id:
+        print("Vous ne pouvez modifier que les événements qui vous sont attribués.")
+        session.close()
+        return
+
+    print("Laissez vide pour ne pas modifier un champ.")
+
+    current_debut = (
+        evenement.date_debut.strftime(
+            "%Y-%m-%d %H:%M") if evenement.date_debut else ""
+    )
+    current_fin = (
+        evenement.date_fin.strftime(
+            "%Y-%m-%d %H:%M") if evenement.date_fin else ""
+    )
+    current_participants = (
+        str(evenement.participants) if evenement.participants is not None else ""
+    )
+
+    new_debut_str = input(
+        f"Nouvelle date de début (AAAA-MM-JJ HH:MM) [{current_debut}] : "
+    )
+    new_fin_str = input(
+        f"Nouvelle date de fin (AAAA-MM-JJ HH:MM) [{current_fin}] : "
+    )
+    new_lieu = input(f"Nouveau lieu [{evenement.lieu or ''}] : ")
+    new_participants_str = input(
+        f"Nouveau nombre de participants [{current_participants}] : "
+    )
+    new_notes = input("Nouvelles notes (laisser vide pour ne pas modifier) : ")
+
+    updates = {}
+
+    # Dates
+    if new_debut_str:
+        try:
+            updates["date_debut"] = datetime.strptime(
+                new_debut_str, "%Y-%m-%d %H:%M")
+        except ValueError:
+            print("Format de date de début invalide. Utilisez AAAA-MM-JJ HH:MM.")
+            session.close()
+            return
+
+    if new_fin_str:
+        try:
+            updates["date_fin"] = datetime.strptime(
+                new_fin_str, "%Y-%m-%d %H:%M")
+        except ValueError:
+            print("Format de date de fin invalide. Utilisez AAAA-MM-JJ HH:MM.")
+            session.close()
+            return
+
+    if new_lieu:
+        updates["lieu"] = new_lieu
+
+    if new_participants_str:
+        try:
+            updates["participants"] = int(new_participants_str)
+        except ValueError:
+            print("Nombre de participants invalide.")
+            session.close()
+            return
+
+    if new_notes:
+        updates["notes"] = new_notes
+
+    # --- Affectation du support (GESTION uniquement) ---
+    if role == "gestion":
+        print("Affectation d'un collaborateur support (optionnel).")
+        # 1. Récupérer tous les utilisateurs SUPPORT
+        # Adapte cette partie selon les méthods dispo dans ton repo utilisateur.
+        supports = [
+            u for u in user_service.repo.get_all()
+            if u.role == "support"
+        ]
+        if not supports:
+            print("Aucun utilisateur avec le role SUPPORT n'est disponible.")
+        else:
+            # 2. Afficher la liste des supports avec RICH
+            supp_table = Table(title="COLLABORATEURS SUPPORT DISPONIBLES")
+            supp_table.add_column("ID", justify="right",
+                                  style="cyan", no_wrap=True)
+            supp_table.add_column("Nom", style="magenta")
+            supp_table.add_column("Email", style="green")
+            for s in supports:
+                supp_table.add_row(str(s.id), s.nom, s.email)
+            console.print(supp_table)
+            # 3. Demande l'ID du support à assigner
+        support_input = input(
+            "ID du support à assigner (laisser vide = ne pas modifier) : "
+        )
+        if support_input:
+            try:
+                support_id = int(support_input)
+            except ValueError:
+                print("ID de support invalide.")
+                session.close()
+                return
+
+            # Verifier que l'ID correspond bien à un support listé
+            support_user = user_service.repo.get_by_id(support_id)
+            if not support_user:
+                print("Utilisateur support introuvable.")
+                session.close()
+                return
+
+            if support_user.role != "support":
+                print("Cet utilisateur n'est pas un collaborateur SUPPORT.")
+                session.close()
+                return
+
+            updates["support_id"] = support_id
+    if not updates:
+        print("Aucune modification appliquée.")
+        session.close()
+        return
+    evenement_service.update_evenement(evenement, **updates)
+    print("Événement mis à jour avec succès.")
+    session.close()

@@ -54,3 +54,24 @@ class EvenementService:
         Retrieve all events assigned to a specific support user.
         """
         return self.repo.get_by_support_id(support_id)
+
+    def get_evenement_by_id(self, evenement_id: int):
+        """
+        Retrieve an event by its identifier.
+        """
+        return self.repo.get_by_id(evenement_id)
+
+    def update_evenement(self, evenement, **fields):
+        """
+        update an existing event with the given field values and persist changes.
+
+        Parameters
+            evenement: Evenement
+                The event instance to update.
+            **fields:
+                Arbitary keyword arguments mapping attribute names to new values.
+        """
+        for attr, value in fields.items():
+            if value is not None:
+                setattr(evenement, attr, value)
+        self.repo.update(evenement)
