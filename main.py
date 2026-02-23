@@ -2,7 +2,7 @@ import getpass
 from cli.auth import run_login, run_logout, whoami
 from models.base import Base, engine
 from sqlalchemy import text
-from cli.user_cli import run_create_user, list_all_users
+from cli.user_cli import run_create_user, list_all_users, run_delete_user, run_update_user
 from utils.jwt_manager import load_token
 from cli.client_cli import run_create_client, list_clients, update_client, delete_client
 from cli.contrat_cli import (
@@ -57,6 +57,8 @@ def main_menu():
         if role == "gestion":
             print("2 - Créer un utilisateur")
             print("3 - Voir tous les utilisateurs")
+            print("19 - Modifier un utilisateur")
+            print("20 - Supprimer un utilisateur")
             print("5 - Créer un client")
             print("8 - Modifier un client")
             print("9 - Supprimer un client")
@@ -122,6 +124,10 @@ def main_menu():
             run_update_contrat()
         elif choice == "18":
             run_delete_contrat()
+        elif choice == "19":
+            run_update_user()
+        elif choice == "20":
+            run_delete_user()
 
         elif choice == "0":
             print("Au revoir!")

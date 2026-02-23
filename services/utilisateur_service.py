@@ -66,3 +66,33 @@ class UtilisateurService:
 
         """
         return self.repo.get_all()
+
+    def get_user_by_id(self, user_id: int):
+        """
+        Retrieve a user by its identifier.
+        """
+        return self.repo.get_by_id(user_id)
+
+    def update_user(self, utilisateur, nom=None, email=None,
+                    role=None, mot_de_passe=None):
+        """
+        Update an existing user with the given field values.
+
+        mot_de_passe, if provided, will be re-hashed.
+        """
+        if nom is not None:
+            utilisateur.nom = nom
+        if email is not None:
+            utilisateur.email = email
+        if role is not None:
+            utilisateur.role = role
+        if mot_de_passe is not None:
+            utilisateur.mot_de_passe = hash_password(mot_de_passe)
+
+        self.repo.update(utilisateur)
+
+    def delete_user(self, utilisateur):
+        """
+        Delete a user from the database.
+        """
+        self.repo.delete(utilisateur)

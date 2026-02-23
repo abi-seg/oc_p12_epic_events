@@ -52,3 +52,18 @@ class UtilisateurRepository:
         Retrieve a user by its identifier.
         """
         return self.session.query(Utilisateur).get(user_id)
+
+    def update(self, utilisateur: Utilisateur):
+        """
+        Persist changes made to an existing user.
+        """
+        self.session.commit()
+        self.session.refresh(utilisateur)
+        return utilisateur
+
+    def delete(self, utilisateur: Utilisateur):
+        """
+        Delete a user from a database.
+        """
+        self.session.delete(utilisateur)
+        self.session.commit()
