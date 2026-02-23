@@ -1,4 +1,4 @@
-import getpass
+
 from cli.auth import run_login, run_logout, whoami
 from models.base import Base, engine
 from sqlalchemy import text
@@ -46,50 +46,70 @@ def main_menu():
 
         # --- Logged in ---
         print(f"Connecté en tant que {payload['email']} (rôle : {role})")
+        # Bloc commun
         print("4 - Déconnexion")
         print("7 - Info utilisateur connecté (whoami)")
 
-        # Lecture seule – tous les rôles
-        print("6 - Voir les clients")
+        # Clients & contrats : lecture pour tous
+        print("7 - Voir les clients")
         print("11 - Voir les contrats")
-        print("15 - Voir les événements")
+        print("17 - Voir les événements")
+
+        # -----Gestion------
 
         if role == "gestion":
+            # Utilisateurs
             print("2 - Créer un utilisateur")
             print("3 - Voir tous les utilisateurs")
             print("19 - Modifier un utilisateur")
             print("20 - Supprimer un utilisateur")
-            print("5 - Créer un client")
+
+            # Clients
+            print("6 - Créer un client")
             print("8 - Modifier un client")
             print("9 - Supprimer un client")
 
+            # Contrats
+
             print("10 - Créer un contrat")
             print("12 - Voir les contrats non signés")
             print("13 - Voir les contrats non entièrement payés")
-            print("17 - Modifier un contrat")
-            print("18 - Supprimer un contrat")
+            print("14 - Modifier un contrat")
+            print("15 - Supprimer un contrat")
 
-            print("16 - Modifier un evenement")
-            # plus tard : options événements (création, assignation support, etc.)
+            # Evénements
+
+            print("18 - Modifier un evenement")
+
+            # ------- COMMERCIAL -------
 
         elif role == "commercial":
-            print("5 - Créer un client")
+            # Clients
+
+            print("6 - Créer un client")
             print("8 - Modifier un client")
+
+            # Contrats
 
             print("10 - Créer un contrat")
             print("12 - Voir les contrats non signés")
             print("13 - Voir les contrats non entièrement payés")
-            print("14 - Créer un événement")
-            print("17 - Modifier un contrat")
-            # plus tard : créer un événement pour un contrat signé
+            print("14 - Modifier un contrat")
+
+            # Evénéménts
+            print("16 - Créer un événémént")
+
+        # ---- SUPPORT-----
 
         elif role == "support":
 
-            print("16 - Modifier un événement")
+            # Evénéments
+
+            print("18 - Modifier un événement")
 
         choice = input("Choisissez une option : ")
 
-        # --- Actions communes / existantes ---
+        # --- Actions  ---
         if choice == "2":
             run_create_user()           # déjà protégé par rôle à l’intérieur si tu veux
         elif choice == "3":
@@ -97,11 +117,12 @@ def main_menu():
         elif choice == "4":
             run_logout()
         elif choice == "5":
-            run_create_client()
-        elif choice == "6":
-            list_clients()
-        elif choice == "7":
             whoami()
+        elif choice == "6":
+            run_create_client()
+
+        elif choice == "7":
+            list_clients()
         elif choice == "8":
             update_client()
         elif choice == "9":
@@ -115,20 +136,19 @@ def main_menu():
         elif choice == "13":
             run_list_contrats_non_payes()
         elif choice == "14":
-            run_create_evenement()
-        elif choice == "15":
-            run_list_evenements()
-        elif choice == "16":
-            run_update_evenement()
-        elif choice == "17":
             run_update_contrat()
-        elif choice == "18":
+        elif choice == "15":
             run_delete_contrat()
+        elif choice == "16":
+            run_create_evenement()
+        elif choice == "17":
+            run_list_evenements()
+        elif choice == "18":
+            run_update_evenement()
         elif choice == "19":
             run_update_user()
         elif choice == "20":
             run_delete_user()
-
         elif choice == "0":
             print("Au revoir!")
             break
