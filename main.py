@@ -64,6 +64,9 @@ def main_menu():
             print("10 - Créer un contrat")
             print("12 - Voir les contrats non signés")
             print("13 - Voir les contrats non entièrement payés")
+            print("17 - Modifier un contrat")
+            print("18 - Supprimer un contrat")
+
             print("16 - Modifier un evenement")
             # plus tard : options événements (création, assignation support, etc.)
 
@@ -75,6 +78,7 @@ def main_menu():
             print("12 - Voir les contrats non signés")
             print("13 - Voir les contrats non entièrement payés")
             print("14 - Créer un événement")
+            print("17 - Modifier un contrat")
             # plus tard : créer un événement pour un contrat signé
 
         elif role == "support":
@@ -114,6 +118,10 @@ def main_menu():
             run_list_evenements()
         elif choice == "16":
             run_update_evenement()
+        elif choice == "17":
+            run_update_contrat()
+        elif choice == "18":
+            run_delete_contrat()
 
         elif choice == "0":
             print("Au revoir!")
