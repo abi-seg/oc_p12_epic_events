@@ -2,7 +2,7 @@ Epic Events CRM (CLI)
 
 CRM en ligne de commande sécurisé avec gestion avancée des rôles, architecture en couches et authentification JWT.
 
-📌 Contexte
+## 📌 Contexte
 
 Projet réalisé dans le cadre du parcours Développeur d'application Python – OpenClassrooms (Projet P12).
 
@@ -16,7 +16,7 @@ les contrats
 les événements
 avec une gestion fine des droits selon le rôle de chaque collaborateur.
 
-🎯 Objectifs pédagogiques
+## 🎯 Objectifs pédagogiques
 
 Ce projet m’a permis de travailler sur :
 Architecture en couches (CLI → Services → Repository → Models)
@@ -28,7 +28,7 @@ Séparation des responsabilités
 Journalisation des erreurs avec Sentry
 Structuration d’un projet Python professionnel
 
-🛠 Stack technique
+## 🛠 Stack technique
 
 Python 3.9+
 SQLAlchemy (ORM)
@@ -39,18 +39,20 @@ python-dotenv (.env)
 Rich (affichage CLI)
 Sentry (monitoring)
 
-👥 Gestion des rôles
+## 👥 Gestion des rôles
 
 L’application repose sur le principe du moindre privilège.
 
-🔹 Rôles disponibles
-   gestion
-  commercial
-  support
-🔐 Permissions par rôle
-🟦 Rôle : gestion: Accès complet au système.
+### 🔹 Rôles disponibles
+      gestion
+     commercial
+     support
+## 🔐 Permissions par rôle
 
-Peut :
+### Rôle : gestion: Accès complet au système.
+
+**Peut :**
+
 Créer / modifier / supprimer des utilisateurs
 Créer / modifier / supprimer tous les clients
 Créer / modifier / supprimer tous les contrats
@@ -58,9 +60,10 @@ Voir tous les événements
 Modifier tous les événements
 Assigner ou changer un support sur un événement
 
-Rôle : commercial : Accès limité à son portefeuille clients.
+### Rôle : commercial : Accès limité à son portefeuille clients.
 
-Peut :
+**Peut :**
+
 Créer des clients (automatiquement liés à lui)
 Voir uniquement ses propres clients
 Modifier uniquement ses propres clients
@@ -68,24 +71,27 @@ Créer des contrats pour ses clients
 Modifier uniquement ses contrats
 Créer un événement uniquement si le contrat est signé
 
-Ne peut pas :
+**Ne peut pas :**
+
 Supprimer des clients
 Supprimer des contrats
 Modifier les événements
 
-Rôle : support : Accès opérationnel aux événements assignés.
+### Rôle : support : Accès opérationnel aux événements assignés.
 
-Peut :
+**Peut :**
+
 Voir uniquement les événements qui lui sont assignés
 Modifier uniquement les événements qui lui sont assignés
 
-Ne peut pas :
+**Ne peut pas :**
+
 Créer des clients
 Créer des contrats
 Créer des événements
 Accéder aux données hors assignation
 
-🏗 Architecture du projet
+## 🏗 Architecture du projet
 epic_events/
 ├── cli/
 │   ├── auth.py
@@ -101,14 +107,14 @@ epic_events/
 ├── requirements.txt
 └── README.md
 
-Architecture en couches :
+### Architecture en couches :
 
 CLI → interface utilisateur
 Services → logique métier
 Repository → accès base de données
 Models → entités SQLAlchemy
 
-🗄 Modèle de données
+## 🗄 Modèle de données
 Utilisateur
 id
 nom
@@ -116,7 +122,8 @@ email
 mot_de_passe (haché)
 role (gestion / commercial / support)
 
-Relations :
+**Relations :**
+
 contrats (en tant que commercial)
 evenements (en tant que support)
 
@@ -149,7 +156,7 @@ lieu
 participants
 notes
 
-⚙️ Installation
+##⚙️ Installation
 1️⃣ Cloner le dépôt
 git clone https://github.com/abi-seg/oc_p12_epic_events.git
 cd oc_p12_epic_events
@@ -179,7 +186,7 @@ python main.py
 Les tables sont créées automatiquement via :
 Base.metadata.create_all(engine)
 
-🚀 Utilisation
+## 🚀 Utilisation
 Connexion
 1 - Se connecter
 4 - Se déconnecter
@@ -207,7 +214,7 @@ Contrats
 17 - Voir
 18 - Modifier (gestion/support)
 
-🔒 Sécurité
+## 🔒 Sécurité
 
 Mots de passe jamais stockés en clair
 Hash avec bcrypt
@@ -216,7 +223,7 @@ Token stocké localement (.token)
 Vérifications systématiques des rôles
 Protection contre les injections SQL via SQLAlchemy
 
-📊 Monitoring
+## 📊 Monitoring
 
 L’application utilise Sentry pour :
 journaliser les erreurs critiques
