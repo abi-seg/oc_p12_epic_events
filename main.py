@@ -48,7 +48,6 @@ def main_menu():
         print(f"Connecté en tant que {payload['email']} (rôle : {role})")
         # Bloc commun
         print("4 - Déconnexion")
-        print("7 - Info utilisateur connecté (whoami)")
 
         # Clients & contrats : lecture pour tous
         print("7 - Voir les clients")
@@ -116,8 +115,7 @@ def main_menu():
             list_all_users()
         elif choice == "4":
             run_logout()
-        elif choice == "5":
-            whoami()
+
         elif choice == "6":
             run_create_client()
 

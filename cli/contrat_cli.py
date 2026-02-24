@@ -5,6 +5,9 @@ from services.client_service import ClientService
 from services.utilisateur_service import UtilisateurService
 from models.base import Session
 from utils.jwt_manager import load_token
+from rich.table import Table
+from rich.console import Console
+console = Console()
 
 # -----------------------
 # Create a new contract
@@ -158,12 +161,15 @@ def run_list_contrats():
         session.close()
         return
 
-    print(" **** LISTE DES CONTRATS ****")
-    print(
-        f"{'ID':<4} | {'Client':<25} | {'Commercial':<15} | "
-        f"{'Total (€)':<10} | {'Restant (€)':<12} | {'Date':<12} | {'Statut':<8}"
-    )
-    print("-" * 100)
+    table = Table(
+        title="[bold bright_cyan]LISTE DES CONTRATS[/bold bright_cyan]")
+    table.add_column("ID", justify="right", style="cyan", no_wrap=True)
+    table.add_column("Client", style="magenta")
+    table.add_column("Commercial", style="blue")
+    table.add_column("Total (€)", justify="right", style="green")
+    table.add_column("Restant (€)", justify="right", style="yellow")
+    table.add_column("Date", style="white")
+    table.add_column("Statut", style="bright_white")
 
     for c in contrats:
         client_name = c.client.nom_complet if c.client else "Inconnu"
@@ -172,12 +178,16 @@ def run_list_contrats():
         date_str = c.date_creation.strftime(
             "%Y-%m-%d") if c.date_creation else "N/A"
 
-        print(
-            f"{c.id:<4} | {client_name:<25} | {commercial_name:<15} | "
-            f"{float(c.montant_total):<10.2f} | {float(c.montant_restant):<12.2f} | "
-            f"{date_str:<12} | {statut_label:<8}"
+        table.add_row(
+            str(c.id),
+            client_name,
+            commercial_name,
+            f"{float(c.montant_total):.2f}",
+            f"{float(c.montant_restant):.2f}",
+            date_str,
+            statut_label,
         )
-
+    console.print(table)
     session.close()
 
 

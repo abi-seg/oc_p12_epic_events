@@ -2,6 +2,10 @@ from services.client_service import ClientService
 from services.utilisateur_service import UtilisateurService
 from models.base import Session
 from utils.jwt_manager import load_token
+from rich.table import Table
+from rich.console import Console
+
+console = Console()
 
 
 def run_create_client():
@@ -76,17 +80,29 @@ def list_clients():
         return
     if not clients:
         print("Aucun client trouvé.")
-    else:
-        print(" **** LISTE DES CLIENTS ****")
-        print(
-            f"{'ID':<4} | {'Nom complet':<20} | {'Email':<30} | "
-            f" {'Téléphone':<15} | {'Entreprise':<25} | Commercial")
-        print("-" * 120)
+        session.close()
+        return
+
+    table = Table(
+        title="[bold bright_cyan] LISTE DES CLIENTS [/bold bright_cyan]")
+    table.add_column("ID", justify="right", style="cyan", no_wrap=True)
+    table.add_column("Nom complet", style="magenta")
+    table.add_column("Email", style="green")
+    table.add_column("Téléphone", style="yellow")
+    table.add_column("Entreprise", style="white")
+    table.add_column("Commercial", style="blue")
 
     for client in clients:
         commercial_name = client.commercial.nom if client.commercial else "Non assigné"
-        print(f"{client.id:<4} | {client.nom_complet:<20} | {client.email:<30} |"
-              f"{client.telephone:<15} | {client.entreprise:<25} | {commercial_name}")
+        table.add_row(
+            str(client.id),
+            client.nom_complet,
+            client.email,
+            client.telephone or "",
+            client.entreprise or "",
+            commercial_name,
+        )
+    console.print(table)
     session.close()
 
 

@@ -178,7 +178,8 @@ def run_list_evenements():
         session.close()
         return
 
-    table = Table(title="Liste des événements")
+    table = Table(
+        title="[bold bright_cyan ] LISTE DES EVENEMENTS [/bold bright_cyan]")
 
     table.add_column("Event ID", justify="right", style="cyan", no_wrap=True)
     table.add_column("Contract ID", justify="right", style="green")
@@ -280,7 +281,8 @@ def run_update_evenement():
         return
 
     # Afficher les événements avec rich
-    table = Table(title="Événements modifiables")
+    table = Table(
+        title="[bold bright_cyan] EVENEMENTS MODIFIABLES [/bold bright_cyan]")
     table.add_column("ID", justify="right", style="cyan", no_wrap=True)
     table.add_column("Client", style="magenta")
     table.add_column("Support", style="blue")

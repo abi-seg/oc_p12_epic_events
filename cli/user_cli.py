@@ -1,6 +1,10 @@
 from services.utilisateur_service import UtilisateurService
 from models.base import Session
 from utils.jwt_manager import load_token
+from rich.table import Table
+from rich.console import Console
+
+console = Console()
 
 
 def run_create_user():
@@ -31,12 +35,22 @@ def list_all_users():
     service = UtilisateurService(session)
 
     users = service.list_users()
-    print("\n Liste des utilisateurs: ")
+
     if not users:
         print("Aucun utilisateur trouvé.")
-    for user in users:
-        print(
-            f"ID: {user.id}, Nom: {user.nom}, Email: {user.email}, Role: {user.role}")
+        session.close()
+        return
+    table = Table(
+        title="[bold bright_cyan] LISTE DES UTILISATEURS [/bold bright_cyan]")
+    table.add_column("ID", justify="right", style="cyan", no_wrap=True)
+    table.add_column("Nom", style="magenta")
+    table.add_column("Email", style="green")
+    table.add_column("Role", style="Yellow")
+
+    for u in users:
+        table.add_row(str(u.id), u.nom, u.email, u.role)
+
+    console.print(table)
 
     session.close()
 # cli/user_cli.py
