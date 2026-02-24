@@ -33,7 +33,7 @@ def run_login():
 
         return user  # return logged-in user
     else:
-        print("échec de l'authentification")
+        print("Échec de l’authentification. Vérifiez votre e-mail et votre mot de passe.")
         user = None
         session.close()
         return user
