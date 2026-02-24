@@ -1,6 +1,7 @@
 from models.utilisateur import Utilisateur
 from utils.security import hash_password, verify_password
 from repositories.utilisateur_repository import UtilisateurRepository
+import sentry_sdk
 
 
 class UtilisateurService:
@@ -40,6 +41,12 @@ class UtilisateurService:
         utilisateur = Utilisateur(
             nom=nom, email=email, mot_de_passe=hashed, role=role)
         self.repo.save(utilisateur)
+
+    # Journalisation Sentry
+        sentry_sdk.capture_message(
+            f"[USER_CREATED] id={utilisateur.id}, email={utilisateur.email}, role={utilisateur.role}",
+            level="info"
+        )
         return utilisateur
 
     def login(self, email, password):
@@ -80,6 +87,11 @@ class UtilisateurService:
 
         mot_de_passe, if provided, will be re-hashed.
         """
+        old_data = {
+            "nom": utilisateur.nom,
+            "email": utilisateur.email,
+            "role": utilisateur.role,
+        }
         if nom is not None:
             utilisateur.nom = nom
         if email is not None:
@@ -90,6 +102,13 @@ class UtilisateurService:
             utilisateur.mot_de_passe = hash_password(mot_de_passe)
 
         self.repo.update(utilisateur)
+        # Sentry Journalisation
+        sentry_sdk.capture_message(
+            f"[USER_UPDATED] id={utilisateur.id},"
+            f"old={old_data},"
+            f"new={{'nom': '{utilisateur.nom}', 'email': '{utilisateur.email}', 'role':'{utilisateur.role}'}}",
+            level="info"
+        )
 
     def delete_user(self, utilisateur):
         """

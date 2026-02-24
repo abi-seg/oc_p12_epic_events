@@ -9,6 +9,9 @@ from cli.contrat_cli import (
     run_create_contrat, run_list_contrats, run_update_contrat, run_delete_contrat,
     run_list_contrats_non_payes, run_list_contrats_non_signes)
 from cli.evenement_cli import run_create_evenement, run_list_evenements, run_update_evenement
+import sentry_sdk
+from utils.sentry_config import init_sentry
+
 
 # Placeholder - no models yet, we just test the connection
 Base.metadata.create_all(engine)
@@ -155,4 +158,12 @@ def main_menu():
 
 
 if __name__ == "__main__":
-    main_menu()
+    init_sentry()
+    # Test Entry
+    sentry_sdk.capture_message("Test message from Abi", level="info")
+    try:
+        main_menu()
+    except Exception:
+        # toutes les exceptions non gérées sont envoyées à Sentry
+        sentry_sdk.capture_exception()
+        raise

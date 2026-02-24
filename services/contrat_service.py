@@ -3,6 +3,7 @@
 from models.contrat import Contrat
 from repositories.contrat_repository import ContratRepository
 from datetime import date
+import sentry_sdk
 
 
 class ContratService:
@@ -82,10 +83,17 @@ class ContratService:
             **fields: 
                 Arbitrary key arguments mapping attribute names to new values.
         """
+        old_statut = contrat.statut
         for attr, value in fields.items():
             if value is not None:
                 setattr(contrat, attr, value)
         self.repo.update(contrat)
+        # Détection de la signature du contrat
+        if old_statut is False and contrat.staut is True:
+            sentry_sdk.capture_message(
+                f"[CONTRAT_SIGNE] id={contrat.id}, client_id={contrat.client_id}, commercial_id={contrat.commercial_id}",
+                level="info",
+            )
 
     def delete_contrat(self, contrat: Contrat):
         """
