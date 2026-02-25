@@ -2,7 +2,7 @@ Epic Events CRM (CLI)
 
 CRM en ligne de commande sécurisé avec gestion avancée des rôles, architecture en couches et authentification JWT.
 
-📌 Contexte
+## 📌 Contexte
 
 Projet réalisé dans le cadre du parcours Développeur d'application Python – OpenClassrooms (Projet P12).
 
@@ -21,7 +21,7 @@ les événements
 
 avec une gestion fine des droits selon le rôle de chaque collaborateur.
 
-🎯 Objectifs pédagogiques
+## 🎯 Objectifs pédagogiques
 
 Ce projet m’a permis de travailler sur :
 
@@ -41,7 +41,7 @@ Journalisation des erreurs avec Sentry
 
 Structuration d’un projet Python professionnel
 
-🛠 Stack technique
+## 🛠 Stack technique
 
 Python 3.9+
 
@@ -59,11 +59,11 @@ Rich (affichage CLI)
 
 Sentry (monitoring & logging)
 
-👥 Gestion des rôles
+## 👥 Gestion des rôles
 
 L’application repose sur le principe du moindre privilège.
 
-🔹 Rôles disponibles
+### 🔹 Rôles disponibles
 
 gestion
 
@@ -71,12 +71,12 @@ commercial
 
 support
 
-🔐 Permissions par rôle
-🟦 Rôle : gestion
+## 🔐 Permissions par rôle
+### 🟦 Rôle : gestion
 
 Accès complet au système.
 
-Peut :
+**Peut :** 
 
 Créer / modifier / supprimer des utilisateurs
 
@@ -90,11 +90,11 @@ Modifier tous les événements
 
 Assigner ou changer un support sur un événement
 
-🟩 Rôle : commercial
+### 🟩 Rôle : commercial
 
 Accès limité à son portefeuille clients.
 
-Peut :
+**Peut :**
 
 Créer des clients (automatiquement liés à lui)
 
@@ -108,7 +108,7 @@ Modifier uniquement ses contrats
 
 Créer un événement uniquement si le contrat est signé
 
-Ne peut pas :
+**Ne peut pas :**
 
 Supprimer des clients
 
@@ -116,17 +116,17 @@ Supprimer des contrats
 
 Modifier les événements
 
-🟨 Rôle : support
+### 🟨 Rôle : support
 
 Accès opérationnel aux événements assignés.
 
-Peut :
+**Peut :**
 
 Voir uniquement les événements qui lui sont assignés
 
 Modifier uniquement les événements qui lui sont assignés
 
-Ne peut pas :
+**Ne peut pas :**
 
 Créer des clients
 
@@ -136,7 +136,8 @@ Créer des événements
 
 Accéder aux données hors assignation
 
-🏗 Architecture du projet
+## 🏗 Architecture du projet
+
 epic_events/
 ├── cli/
 │   ├── auth.py
@@ -156,6 +157,7 @@ epic_events/
 ├── main.py
 ├── requirements.txt
 └── README.md
+
 Architecture en couches
 
 CLI → Interface utilisateur
@@ -166,8 +168,8 @@ Repositories → Accès base de données
 
 Models → Entités SQLAlchemy
 
-🗄 Modèle de données
-Utilisateur
+## 🗄 Modèle de données
+**Utilisateur**
 
 id
 
@@ -179,13 +181,13 @@ mot_de_passe (haché)
 
 role (gestion / commercial / support)
 
-Relations :
+**Relations :**
 
 contrats (en tant que commercial)
 
 evenements (en tant que support)
 
-Client
+**Client**
 
 id
 
@@ -203,7 +205,7 @@ derniere_mise_a_jour
 
 commercial_id (FK)
 
-Contrat
+**Contrat**
 
 id
 
@@ -237,11 +239,15 @@ participants
 
 notes
 
-⚙️ Installation
-1️⃣ Cloner le dépôt
+## ⚙️ Installation
+
+### 1️⃣ Cloner le dépôt
+
 git clone https://github.com/abi-seg/oc_p12_epic_events.git
 cd oc_p12_epic_events
-2️⃣ Créer un environnement virtuel
+
+### 2️⃣ Créer un environnement virtuel
+
 python -m venv venv
 
 Activation :
@@ -253,47 +259,64 @@ venv\Scripts\activate
 macOS / Linux
 
 source venv/bin/activate
-3️⃣ Installer les dépendances
+
+### 3️⃣ Installer les dépendances
+
 pip install -r requirements.txt
-4️⃣ Créer un fichier .env
+
+### 4️⃣ Créer un fichier .env
+
 DATABASE_URL=mysql+pymysql://USER:PASSWORD@HOST:PORT/NOM_BASE
 SECRET_KEY=une_cle_secrete_pour_le_JWT
 SENTRY_DSN=optional
 SENTRY_ENV=dev
-5️⃣ Lancer l’application
+
+### 5️⃣ Lancer l’application
+
 python main.py
 
 Les tables sont créées automatiquement via :
 
 Base.metadata.create_all(engine)
-🚀 Utilisation
-Connexion
+
+## 🚀 Utilisation
+
+**Connexion**
+
 1 - Se connecter
 4 - Se déconnecter
 5 - Voir utilisateur connecté
 0 - Quitter
-Gestion des utilisateurs (gestion)
+
+**Gestion des utilisateurs (gestion)**
+
 2  - Créer un utilisateur
 3  - Voir tous les utilisateurs
 19 - Modifier
 20 - Supprimer
-Clients
+
+**Clients**
+
 6 - Créer
 7 - Voir
 8 - Modifier
 9 - Supprimer (gestion)
-Contrats
+
+**Contrats**
+
 10 - Créer
 11 - Voir tous
 12 - Voir non signés
 13 - Voir non payés
 14 - Modifier
 15 - Supprimer
-Événements
+
+**Événements**
 16 - Créer (commercial)
 17 - Voir
 18 - Modifier (gestion/support)
-🔒 Sécurité
+
+## 🔒 Sécurité
 
 Mots de passe jamais stockés en clair
 
@@ -307,7 +330,7 @@ Vérifications systématiques des rôles
 
 Protection contre les injections SQL via SQLAlchemy
 
-📊 Monitoring
+## 📊 Monitoring
 
 L’application utilise Sentry pour :
 
